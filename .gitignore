@@ -1,0 +1,6 @@
+.DS_Store
+graphify-out/
+Embers/build/
+Embers/Embers.app/
+xcuserdata/
+*.xcuserstate
