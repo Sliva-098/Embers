@@ -152,7 +152,7 @@ struct ContentView: View {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(searchFocused ? Theme.orange : Theme.faint)
-            TextField("", text: $query, prompt: Text("Найти игру из квеста — например, EVE Online").foregroundColor(Theme.faint))
+            TextField("", text: $query, prompt: Text("Найти игру из квеста — например, Rust").foregroundColor(Theme.faint))
                 .textFieldStyle(.plain)
                 .font(.system(size: 15))
                 .focused($searchFocused)
