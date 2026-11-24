@@ -1,7 +1,7 @@
 {
   "name": "embers",
   "productName": "Embers",
-  "version": "1.2.0",
+  "version": "1.0.0",
   "description": "Completes Discord game quests without installing the games",
   "main": "main.js",
   "license": "MIT",
