@@ -43,7 +43,7 @@ let doneCount = 0;
 let refreshing = false;
 let lastError = null;
 let queueToken = 0;                  // увеличиваем, чтобы отменить текущий цикл очереди
-let settings = { lang: 'en' };
+let settings = { lang: 'en', langChosen: false };
 
 function sortGames(list) {
   const isLetter = (s) => /^\p{L}/u.test(s);
@@ -168,7 +168,6 @@ function killStrays() {
 
 // ---------------------------------------------------------------- очередь
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const saveQueue = () => writeJson(path.join(dataDir(), 'queue.json'), queue);
 let uidSeq = Date.now();
 
 async function runQueue(token) {
@@ -183,7 +182,7 @@ async function runQueue(token) {
     if (token !== queueToken) return;                       // очередь остановили
     stopGame(item.gameId);
     queue = queue.filter((q) => q.uid !== item.uid);
-    saveQueue();
+    
     doneCount++;
     currentUid = null;
     if (!queue.length) break;
@@ -221,27 +220,27 @@ const commands = {
   enqueue: (id) => {
     if (!byId.has(id) || queue.some((q) => q.gameId === id)) return;
     queue.push({ uid: ++uidSeq, gameId: id, minutes: 15 });
-    saveQueue(); emit();
+    emit();
   },
   dequeue: (uid) => {
     if (uid === currentUid) { const q = queue.find((x) => x.uid === uid); if (q) stopGame(q.gameId); return; }
-    queue = queue.filter((q) => q.uid !== uid); saveQueue(); emit();
+    queue = queue.filter((q) => q.uid !== uid); emit();
   },
   move: ({ uid, delta }) => {
     const i = queue.findIndex((q) => q.uid === uid), j = i + delta;
     if (i < 0 || j < 0 || j >= queue.length || queue[i].uid === currentUid || queue[j].uid === currentUid) return;
-    [queue[i], queue[j]] = [queue[j], queue[i]]; saveQueue(); emit();
+    [queue[i], queue[j]] = [queue[j], queue[i]]; emit();
   },
   setMinutes: ({ uid, minutes }) => {
     const q = queue.find((x) => x.uid === uid);
-    if (q && uid !== currentUid) { q.minutes = minutes; saveQueue(); emit(); }
+    if (q && uid !== currentUid) { q.minutes = minutes; emit(); }
   },
-  clearQueue: () => { stopQueue(); queue = []; doneCount = 0; saveQueue(); emit(); },
+  clearQueue: () => { stopQueue(); queue = []; doneCount = 0; emit(); },
   startQueue: () => startQueue(),
   stopQueue: () => stopQueue(),
   skip: () => { const q = queue.find((x) => x.uid === currentUid); if (q) stopGame(q.gameId); },
   refreshDb: () => refreshDb(),
-  setLang: (lang) => { settings.lang = lang === 'ru' ? 'ru' : 'en'; writeJson(path.join(dataDir(), 'settings.json'), settings); emit(); },
+  setLang: (lang) => { settings.lang = lang === 'ru' ? 'ru' : 'en'; settings.langChosen = true; writeJson(path.join(dataDir(), 'settings.json'), settings); emit(); },
   dismissError: () => { lastError = null; emit(); },
   openLink: (url) => { if (/^https:\/\//.test(url)) shell.openExternal(url); },
 };
@@ -250,7 +249,7 @@ function snapshot() {
   return {
     sessions: [...sessions.values()].map((s) => ({ id: s.gameId, startedAt: s.startedAt, goalMs: s.goalMs })),
     queue, queueRunning, currentUid, nextStartAt, doneCount, refreshing,
-    error: lastError, lang: settings.lang, minuteMs: MINUTE, gameCount: games.length,
+    error: lastError, lang: settings.lang, langChosen: !!settings.langChosen, minuteMs: MINUTE, gameCount: games.length,
   };
 }
 
@@ -286,9 +285,10 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  if (process.platform === 'win32') app.setAppUserModelId('app.embers.questrunner');
   settings = { ...settings, ...readJson(path.join(dataDir(), 'settings.json'), {}) };
-  queue = readJson(path.join(dataDir(), 'queue.json'), []).filter((q) => q && q.gameId);
-  uidSeq = Math.max(uidSeq, ...queue.map((q) => q.uid || 0));
+  // Очередь хранится только в памяти. Файл от прошлых версий удаляем, чтобы ничего не оставалось.
+  try { fs.rmSync(path.join(dataDir(), 'queue.json'), { force: true }); } catch { /* нет файла */ }
   killStrays();
   loadGames();
   createWindow();

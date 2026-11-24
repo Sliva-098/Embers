@@ -1,8 +1,8 @@
 # Embers for Windows
 
 Completes Discord **game quests** ("play a game for 15 minutes") without installing the games.
-Click a cover and Discord thinks you are playing. Language: **English** by default, switch to
-Russian with the **EN / RU** button in the top bar.
+Click a cover and Discord thinks you are playing. On first launch the app asks for your language (English is the default) and
+remembers it. You can switch any time with the **EN / RU** button in the top bar.
 
 > **Video (ad) quests do not work.** Quests like "Watch a video, get 200 Orbs" can't be completed
 > with Embers. It only handles quests that ask you to **play a game**.
@@ -40,7 +40,7 @@ For several quests at once, don't switch games by hand:
 
 The games then run one by one: a game runs for its time plus 45 seconds as a safety margin, then
 a 5 second pause, then the next game. **Skip** jumps to the next game, **Stop queue** ends it.
-The queue is saved if you close the app.
+The queue is not saved: it lives only while the app is open, and closing the app clears it.
 
 ## Tips
 

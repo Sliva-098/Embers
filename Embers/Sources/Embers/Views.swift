@@ -38,6 +38,8 @@ struct ContentView: View {
     @State private var query = ""
     @FocusState private var searchFocused: Bool
     @AppStorage(Lang.key) private var lang = "en"
+    /// Пока язык ни разу не выбирали (ключа нет в UserDefaults), при запуске показываем выбор языка.
+    @State private var needsLanguage = UserDefaults.standard.object(forKey: Lang.key) == nil
 
     private var results: [Game] {
         let q = query.trimmingCharacters(in: .whitespaces).lowercased()
@@ -72,6 +74,15 @@ struct ContentView: View {
             .ignoresSafeArea(edges: .top)
             .id(lang)   // смена языка перерисовывает весь интерфейс
         }
+        .overlay {
+            if needsLanguage {
+                LanguagePicker { choice in
+                    lang = choice                       // запоминается в UserDefaults навсегда
+                    withAnimation(.easeOut(duration: 0.2)) { needsLanguage = false }
+                }
+                .transition(.opacity)
+            }
+        }
         .foregroundStyle(Theme.text)
         .tint(Theme.orange)
         .alert(t("Something went wrong", "Не получилось"), isPresented: Binding(get: { runner.error != nil }, set: { if !$0 { runner.error = nil } })) {
@@ -86,9 +97,9 @@ struct ContentView: View {
     // Шапка в строке со «светофором» окна
     private var header: some View {
         HStack(spacing: 10) {
-            Image(systemName: "flame.fill")
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(Theme.orange)
+            Image(nsImage: NSApp.applicationIconImage)
+                .resizable().interpolation(.high)
+                .frame(width: 24, height: 24)
             Text("Embers").font(.system(size: 15, weight: .semibold))
             Spacer()
             Button {
@@ -649,5 +660,58 @@ struct ProgressTrack: View {
         }
         .frame(height: 8)
         .animation(.linear(duration: 1), value: value)
+    }
+}
+
+
+// MARK: - Выбор языка при первом запуске
+
+struct LanguagePicker: View {
+    let choose: (String) -> Void
+
+    var body: some View {
+        ZStack {
+            Theme.ground.ignoresSafeArea()
+            VStack(spacing: 0) {
+                Image(nsImage: NSApp.applicationIconImage)
+                    .resizable().interpolation(.high)
+                    .frame(width: 96, height: 96)
+                Text("Welcome to Embers")
+                    .font(.system(size: 26, weight: .bold))
+                    .padding(.top, 22)
+                Text("Choose your language · Выберите язык")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Theme.muted)
+                    .padding(.top, 8)
+
+                VStack(spacing: 10) {
+                    Button { choose("en") } label: {
+                        Text("English")
+                            .font(.system(size: 15, weight: .bold))
+                            .frame(maxWidth: .infinity).frame(height: 46)
+                            .background(Theme.orange, in: Capsule())
+                            .foregroundStyle(Theme.orangeInk)
+                    }
+                    .keyboardShortcut(.defaultAction)    // Enter = English
+                    Button { choose("ru") } label: {
+                        Text("Русский")
+                            .font(.system(size: 15, weight: .semibold))
+                            .frame(maxWidth: .infinity).frame(height: 46)
+                            .background(Theme.raised, in: Capsule())
+                            .foregroundStyle(Theme.text)
+                    }
+                }
+                .buttonStyle(.plain)
+                .frame(width: 280)
+                .padding(.top, 30)
+
+                Text("You can change it later with the EN / RU button · Язык можно сменить кнопкой EN / RU")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.faint)
+                    .multilineTextAlignment(.center)
+                    .frame(width: 360)
+                    .padding(.top, 20)
+            }
+        }
     }
 }

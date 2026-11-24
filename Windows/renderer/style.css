@@ -21,7 +21,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 #top { position: fixed; inset: 0 0 auto 0; height: 44px; display: flex; align-items: center; justify-content: space-between;
   padding: 0 150px 0 20px; background: var(--ground); -webkit-app-region: drag; z-index: 5; }
 .brand { display: flex; align-items: center; gap: 9px; font-weight: 600; font-size: 15px; }
-.flame { width: 18px; height: 18px; fill: var(--orange); stroke: none; }
+.logo { width: 24px; height: 24px; border-radius: 6px; display: block; }
 .top-actions { display: flex; gap: 8px; -webkit-app-region: no-drag; }
 .pill, .round { background: var(--surface); color: var(--muted); height: 28px; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .pill { padding: 0 11px; font-size: 12px; }
@@ -135,3 +135,12 @@ kbd { font: inherit; font-size: 12px; color: var(--faint); }
 #sentinel { height: 1px; }
 
 #toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); max-width: 80%; background: var(--raised); color: var(--text); border: 1px solid var(--line); padding: 12px 18px; border-radius: 12px; font-size: 13px; z-index: 10; }
+
+/* выбор языка при первом запуске */
+#picker { position: fixed; inset: 0; background: var(--ground); z-index: 20; display: grid; place-items: center; -webkit-app-region: drag; }
+.picker-card { width: 360px; display: flex; flex-direction: column; align-items: center; text-align: center; -webkit-app-region: no-drag; }
+.picker-logo { width: 96px; height: 96px; border-radius: 22px; }
+.picker-card h1 { font-size: 26px; font-weight: 700; margin-top: 22px; }
+.picker-card p { color: var(--muted); font-size: 14px; margin: 8px 0 30px; }
+.btn.wide { width: 280px; height: 46px; border-radius: 23px; justify-content: center; font-size: 15px; margin-bottom: 10px; }
+.picker-card small { color: var(--faint); font-size: 12px; margin-top: 10px; line-height: 1.45; }

@@ -32,7 +32,8 @@ final class Runner: ObservableObject {
     @Published var error: String?
 
     // MARK: Очередь
-    @Published var queue: [QueueItem] = [] { didSet { saveQueue() } }
+    /// Очередь хранится только в памяти: после закрытия приложения она пуста.
+    @Published var queue: [QueueItem] = []
     @Published private(set) var queueRunning = false
     @Published private(set) var queueCurrent: QueueItem?
     @Published private(set) var nextStartAt: Date?
@@ -55,7 +56,8 @@ final class Runner: ObservableObject {
 
     private init() {
         killStrays()
-        loadQueue()
+        // Старые версии сохраняли очередь на диск — удаляем её, чтобы ничего не оставалось.
+        UserDefaults.standard.removeObject(forKey: "embers.queue")
     }
 
     func isRunning(_ g: Game) -> Bool { sessions.contains { $0.id == g.id } }
@@ -174,16 +176,6 @@ final class Runner: ObservableObject {
         nextStartAt = nil
         queueRunning = false
         queueTask = nil
-    }
-
-    // Очередь переживает перезапуск приложения.
-    private static let queueKey = "embers.queue"
-    private func saveQueue() {
-        if let d = try? JSONEncoder().encode(queue) { UserDefaults.standard.set(d, forKey: Self.queueKey) }
-    }
-    private func loadQueue() {
-        if let d = UserDefaults.standard.data(forKey: Self.queueKey),
-           let q = try? JSONDecoder().decode([QueueItem].self, from: d) { queue = q }
     }
 
     /// Пустышки, оставшиеся после аварийного выхода, закрываем при старте.

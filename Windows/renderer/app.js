@@ -252,6 +252,7 @@
 
   // ------------------------------------------------------------ состояние
   function apply(state) {
+    $('picker').hidden = !!state.langChosen;   // окно выбора языка — только пока язык не выбран
     const langChanged = state.lang !== lang;
     S = state; lang = state.lang;
     renderChrome(); renderNow(); renderQueue(); paintAllTiles(); showError(); tick();
@@ -266,6 +267,9 @@
     if (S) { renderNow(); renderQueue(); renderFeatured(); renderLibrary(); }
   }
 
+  $('pickEn').onclick = () => window.embers.cmd('setLang', 'en');
+  $('pickRu').onclick = () => window.embers.cmd('setLang', 'ru');
+  document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !$('picker').hidden) window.embers.cmd('setLang', 'en'); });
   $('lang').onclick = () => window.embers.cmd('setLang', lang === 'en' ? 'ru' : 'en');
   $('refresh').onclick = () => window.embers.cmd('refreshDb');
   $('search').addEventListener('input', (e) => {

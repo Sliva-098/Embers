@@ -37,7 +37,7 @@ anything, and your computer stays idle.
 - **Queue:** add several games, set the time for each, and they run one after another.
 - **Windows games work on a Mac too**, for example EVE Online, Honkai: Star Rail, Genshin Impact.
 - **Runs in the background:** minimize the window and use your computer as usual.
-- **English and Russian:** English by default, switch with the **EN / RU** button.
+- **English and Russian:** the app asks for your language on first launch (English is the default) and remembers your choice. Switch any time with the **EN / RU** button.
 - **Cleans up after itself:** closing the app stops every "game", so no stale status stays in Discord.
 
 ## Download and install
@@ -102,7 +102,7 @@ With several quests, there is no need to switch games by hand.
 
 The games run one by one: a game stays on for its time plus 45 seconds as a safety margin, then
 there is a 5 second pause, then the next game starts. **Skip** jumps straight to the next game,
-**Stop queue** ends it. The queue is saved if you close the app.
+**Stop queue** ends it. The queue is not saved: it lives only while the app is open, and closing the app clears it.
 
 > If several games run at the same time, Discord counts progress for each of them, but shows
 > only one in your profile.
