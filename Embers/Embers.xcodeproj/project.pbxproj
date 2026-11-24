@@ -11,6 +11,7 @@
 		52BD09E8914121BA2138CA93 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA67938AD99AECE8577A497 /* Models.swift */; };
 		789F5A14A70CDF8715255D9A /* games.json in Resources */ = {isa = PBXBuildFile; fileRef = BD6BBEC1E4053035213C6BE6 /* games.json */; };
 		7C872DFD26323C0464ABF7E0 /* Runner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A16B73307782BC886E8D46 /* Runner.swift */; };
+		9E797AE13A99E11AC5632AA7 /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564F0937570B19A1CFDD22C5 /* L10n.swift */; };
 		E66624D01139349AB3AAC811 /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0F3CDF58E8E10B7B20EA3D /* Views.swift */; };
 		F9DFD73512DD001CEC571A36 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E77A708D651D40EE4B4A8B8 /* App.swift */; };
 /* End PBXBuildFile section */
@@ -18,6 +19,7 @@
 /* Begin PBXFileReference section */
 		193E001891E0D9D0286BE7DD /* Embers.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Embers.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		53A16B73307782BC886E8D46 /* Runner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Runner.swift; sourceTree = "<group>"; };
+		564F0937570B19A1CFDD22C5 /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
 		8E77A708D651D40EE4B4A8B8 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		BD6BBEC1E4053035213C6BE6 /* games.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = games.json; sourceTree = "<group>"; };
 		D77D5544EF4B66257B390705 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -30,6 +32,7 @@
 			isa = PBXGroup;
 			children = (
 				8E77A708D651D40EE4B4A8B8 /* App.swift */,
+				564F0937570B19A1CFDD22C5 /* L10n.swift */,
 				FBA67938AD99AECE8577A497 /* Models.swift */,
 				53A16B73307782BC886E8D46 /* Runner.swift */,
 				FA0F3CDF58E8E10B7B20EA3D /* Views.swift */,
@@ -159,6 +162,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F9DFD73512DD001CEC571A36 /* App.swift in Sources */,
+				9E797AE13A99E11AC5632AA7 /* L10n.swift in Sources */,
 				52BD09E8914121BA2138CA93 /* Models.swift in Sources */,
 				7C872DFD26323C0464ABF7E0 /* Runner.swift in Sources */,
 				E66624D01139349AB3AAC811 /* Views.swift in Sources */,

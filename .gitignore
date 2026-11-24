@@ -1,7 +1,11 @@
+*.xcuserstate
 .DS_Store
-graphify-out/
-Embers/build/
 Embers/Embers.app/
 Embers/Embers.dmg
+Embers/build/
+Windows/dist/
+Windows/node_modules/
+Windows/resources/fakegame.exe
+Windows/resources/games.json
+graphify-out/
 xcuserdata/
-*.xcuserstate

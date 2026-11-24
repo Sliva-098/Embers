@@ -1,0 +1,19 @@
+{
+  "name": "embers",
+  "productName": "Embers",
+  "version": "1.0.0",
+  "description": "Completes Discord game quests without installing the games",
+  "main": "main.js",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "prepare-assets": "node build.mjs assets",
+    "dev": "node build.mjs assets && electron .",
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "electron": "^45.4.1",
+    "resedit": "^3.1.1"
+  }
+}

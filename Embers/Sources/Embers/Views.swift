@@ -37,6 +37,7 @@ struct ContentView: View {
     @EnvironmentObject var runner: Runner
     @State private var query = ""
     @FocusState private var searchFocused: Bool
+    @AppStorage(Lang.key) private var lang = "en"
 
     private var results: [Game] {
         let q = query.trimmingCharacters(in: .whitespaces).lowercased()
@@ -69,10 +70,11 @@ struct ContentView: View {
                 .scrollIndicators(.never)
             }
             .ignoresSafeArea(edges: .top)
+            .id(lang)   // смена языка перерисовывает весь интерфейс
         }
         .foregroundStyle(Theme.text)
         .tint(Theme.orange)
-        .alert("Не получилось", isPresented: Binding(get: { runner.error != nil }, set: { if !$0 { runner.error = nil } })) {
+        .alert(t("Something went wrong", "Не получилось"), isPresented: Binding(get: { runner.error != nil }, set: { if !$0 { runner.error = nil } })) {
             Button("OK") { runner.error = nil }
         } message: { Text(runner.error ?? "") }
         .background(
@@ -90,6 +92,19 @@ struct ContentView: View {
             Text("Embers").font(.system(size: 15, weight: .semibold))
             Spacer()
             Button {
+                lang = (lang == "en") ? "ru" : "en"
+            } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: "globe").font(.system(size: 12, weight: .semibold))
+                    Text(lang == "en" ? "EN" : "RU").font(.system(size: 12, weight: .bold))
+                }
+                .padding(.horizontal, 10).frame(height: 28)
+                .background(Theme.surface, in: Capsule())
+                .foregroundStyle(Theme.muted)
+            }
+            .buttonStyle(.plain)
+            .help(t("Switch language", "Сменить язык"))
+            Button {
                 Task { await store.refresh() }
             } label: {
                 Group {
@@ -101,7 +116,7 @@ struct ContentView: View {
                 .foregroundStyle(Theme.muted)
             }
             .buttonStyle(.plain)
-            .help("Обновить базу игр из Discord")
+            .help(t("Refresh the game list from Discord", "Обновить базу игр из Discord"))
             .disabled(store.refreshing)
         }
         .padding(.leading, 64)   // место под кнопки окна
@@ -118,7 +133,7 @@ struct ContentView: View {
 
     private var featuredSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            sectionTitle("Часто бывают в квестах", "одно нажатие — и Discord видит игру")
+            sectionTitle(t("Often in quests", "Часто бывают в квестах"), t("one click and Discord sees the game", "одно нажатие — и Discord видит игру"))
             ScrollView(.horizontal) {
                 LazyHStack(alignment: .top, spacing: 18) {
                     ForEach(store.featured) { GameTile(game: $0).frame(width: 168) }
@@ -131,10 +146,11 @@ struct ContentView: View {
 
     private var librarySection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            sectionTitle(query.isEmpty ? "Все игры" : "Результаты",
-                         query.isEmpty ? "\(store.games.count.formatted()) игр из базы Discord" : "\(results.count.formatted()) по запросу «\(query)»")
+            sectionTitle(query.isEmpty ? t("All games", "Все игры") : t("Results", "Результаты"),
+                         query.isEmpty ? t("\(store.games.count.formatted()) games from Discord's database", "\(store.games.count.formatted()) игр из базы Discord")
+                                       : t("\(results.count.formatted()) for “\(query)”", "\(results.count.formatted()) по запросу «\(query)»"))
             if results.isEmpty {
-                Text("Такой игры нет в базе Discord. Проверьте название в карточке квеста.")
+                Text(t("This game isn't in Discord's database. Check the name in the quest card.", "Такой игры нет в базе Discord. Проверьте название в карточке квеста."))
                     .foregroundStyle(Theme.muted)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, 24)
@@ -152,7 +168,7 @@ struct ContentView: View {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(searchFocused ? Theme.orange : Theme.faint)
-            TextField("", text: $query, prompt: Text("Найти игру из квеста — например, Rust").foregroundColor(Theme.faint))
+            TextField("", text: $query, prompt: Text(t("Find a quest game, e.g. Rust", "Найти игру из квеста — например, Rust")).foregroundColor(Theme.faint))
                 .textFieldStyle(.plain)
                 .font(.system(size: 15))
                 .focused($searchFocused)
@@ -267,7 +283,7 @@ struct GameTile: View {
                                         .foregroundStyle(queued ? Theme.orange : Theme.text)
                                 }
                                 .buttonStyle(.plain)
-                                .help(queued ? "Уже в очереди" : "Добавить в очередь")
+                                .help(queued ? t("Already in queue", "Уже в очереди") : t("Add to queue", "Добавить в очередь"))
                             }
                             Spacer()
                         }
@@ -278,7 +294,7 @@ struct GameTile: View {
                         VStack {
                             Spacer()
                             HStack {
-                                Text("В очереди")
+                                Text(t("In queue", "В очереди"))
                                     .font(.system(size: 11, weight: .bold))
                                     .padding(.horizontal, 9).padding(.vertical, 5)
                                     .background(Theme.raised, in: Capsule())
@@ -310,7 +326,7 @@ struct GameTile: View {
                         .font(.system(size: 13, weight: .semibold))
                         .lineLimit(1)
                         .foregroundStyle(running ? Theme.orange : Theme.text)
-                    Text(running ? "Нажмите, чтобы остановить" : (game.hasMac ? "macOS" : "Windows · работает на Mac"))
+                    Text(running ? t("Click to stop", "Нажмите, чтобы остановить") : (game.hasMac ? "macOS" : t("Windows · runs on Mac", "Windows · работает на Mac")))
                         .font(.system(size: 11))
                         .foregroundStyle(Theme.faint)
                         .lineLimit(1)
@@ -320,13 +336,13 @@ struct GameTile: View {
         }
         .buttonStyle(.plain)
         .onHover { h in withAnimation(.easeOut(duration: 0.18)) { hover = h } }
-        .help(running ? "Остановить \(game.n)" : "Запустить \(game.n)")
+        .help(running ? t("Stop \(game.n)", "Остановить \(game.n)") : t("Start \(game.n)", "Запустить \(game.n)"))
         .contextMenu {
-            Button(running ? "Остановить" : "Запустить сейчас") { running ? runner.stop(game) : runner.start(game) }
+            Button(running ? t("Stop", "Остановить") : t("Start now", "Запустить сейчас")) { running ? runner.stop(game) : runner.start(game) }
             if queued {
-                Button("Убрать из очереди") { runner.queue.removeAll { $0.game.id == game.id } }
+                Button(t("Remove from queue", "Убрать из очереди")) { runner.queue.removeAll { $0.game.id == game.id } }
             } else {
-                Button("Добавить в очередь") { runner.enqueue(game) }
+                Button(t("Add to queue", "Добавить в очередь")) { runner.enqueue(game) }
             }
         }
     }
@@ -338,7 +354,7 @@ struct PlayingBadge: View {
         TimelineView(.periodic(from: .now, by: 1)) { ctx in
             HStack(spacing: 5) {
                 Circle().fill(Theme.orangeInk).frame(width: 6, height: 6)
-                Text("Играет \(clock(ctx.date.timeIntervalSince(startedAt)))")
+                Text(t("Playing \(clock(ctx.date.timeIntervalSince(startedAt)))", "Играет \(clock(ctx.date.timeIntervalSince(startedAt)))"))
                     .font(.system(size: 11, weight: .bold))
                     .monospacedDigit()
             }
@@ -380,9 +396,9 @@ struct NowPlayingPanel: View {
             }
             .frame(width: 104, height: 104)
             VStack(alignment: .leading, spacing: 8) {
-                Text("Сейчас ничего не запущено")
+                Text(t("Nothing running", "Сейчас ничего не запущено"))
                     .font(.system(size: 26, weight: .bold))
-                Text("Нажмите на обложку, чтобы запустить игру сразу, или на «+», чтобы собрать очередь. Discord увидит игру через 5–10 секунд, саму игру устанавливать не нужно.")
+                Text(t("Click a cover to start a game right away, or “+” to build a queue. Discord sees the game within 5–10 seconds, no need to install it. Video (ad) quests are not supported.", "Нажмите на обложку, чтобы запустить игру сразу, или на «+», чтобы собрать очередь. Discord увидит игру через 5–10 секунд, саму игру устанавливать не нужно. Квесты с просмотром рекламы не поддерживаются."))
                     .font(.system(size: 14))
                     .foregroundStyle(Theme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -394,14 +410,15 @@ struct NowPlayingPanel: View {
     /// Пауза между играми очереди.
     private func between(_ next: Date, _ item: QueueItem) -> some View {
         TimelineView(.periodic(from: .now, by: 1)) { ctx in
+            let secs = Int(max(0, next.timeIntervalSince(ctx.date)).rounded(.up))
             HStack(spacing: 22) {
                 Cover(game: item.game, radius: 16).frame(width: 104, height: 104).opacity(0.6)
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Следующая через \(Int(max(0, next.timeIntervalSince(ctx.date)).rounded(.up))) с")
+                    Text(t("Next in \(secs) s", "Следующая через \(secs) с"))
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(Theme.orange)
                     Text(item.game.n).font(.system(size: 26, weight: .bold)).lineLimit(1)
-                    Text("Готово в этой очереди: \(runner.doneCount)")
+                    Text(t("Done in this queue: \(runner.doneCount)", "Готово в этой очереди: \(runner.doneCount)"))
                         .font(.system(size: 13)).foregroundStyle(Theme.muted)
                 }
                 Spacer()
@@ -412,7 +429,7 @@ struct NowPlayingPanel: View {
 
     private var stopQueueButton: some View {
         Button { runner.stopQueue() } label: {
-            Label("Остановить очередь", systemImage: "stop.fill")
+            Label(t("Stop queue", "Остановить очередь"), systemImage: "stop.fill")
                 .font(.system(size: 13, weight: .semibold))
                 .padding(.horizontal, 16).frame(height: 36)
                 .background(Theme.raised, in: Capsule())
@@ -451,7 +468,7 @@ struct NowPlayingPanel: View {
                             Text(clock(elapsed))
                                 .font(.system(size: 34, weight: .bold))
                                 .monospacedDigit()
-                            Text("из \(clock(questLength))")
+                            Text(t("of \(clock(questLength))", "из \(clock(questLength))"))
                                 .font(.system(size: 14))
                                 .foregroundStyle(Theme.muted)
                         }
@@ -461,7 +478,7 @@ struct NowPlayingPanel: View {
                     VStack(alignment: .trailing, spacing: 8) {
                         if fromQueue {
                             Button { runner.skipCurrent() } label: {
-                                Label("Пропустить", systemImage: "forward.end.fill")
+                                Label(t("Skip", "Пропустить"), systemImage: "forward.end.fill")
                                     .font(.system(size: 13, weight: .semibold))
                                     .padding(.horizontal, 16).frame(height: 36)
                                     .background(Theme.raised, in: Capsule())
@@ -471,7 +488,7 @@ struct NowPlayingPanel: View {
                             stopQueueButton
                         } else {
                             Button { runner.stop(s.game) } label: {
-                                Label("Остановить", systemImage: "stop.fill")
+                                Label(t("Stop", "Остановить"), systemImage: "stop.fill")
                                     .font(.system(size: 13, weight: .semibold))
                                     .padding(.horizontal, 16).frame(height: 36)
                                     .background(Theme.raised, in: Capsule())
@@ -490,17 +507,17 @@ struct NowPlayingPanel: View {
     }
 
     private func status(done: Bool, fromQueue: Bool, minutes: Int) -> String {
-        if done { return fromQueue ? "Время вышло, через минуту — следующая игра" : "\(minutes) минут прошло, квест должен засчитаться" }
+        if done { return fromQueue ? t("Time's up, next game in a moment", "Время вышло, через минуту — следующая игра") : t("\(minutes) minutes done, the quest should count", "\(minutes) минут прошло, квест должен засчитаться") }
         if fromQueue {
             let left = runner.queue.count - 1
-            return left > 0 ? "Очередь · после неё ещё \(left)" : "Очередь · последняя игра"
+            return left > 0 ? t("Queue · \(left) more after this", "Очередь · после неё ещё \(left)") : t("Queue · last game", "Очередь · последняя игра")
         }
-        return "Discord видит игру"
+        return t("Discord sees the game", "Discord видит игру")
     }
 
     private func others(excluding s: Session) -> some View {
         HStack(spacing: 8) {
-            Text("Тоже запущены:").font(.system(size: 12)).foregroundStyle(Theme.faint)
+            Text(t("Also running:", "Тоже запущены:")).font(.system(size: 12)).foregroundStyle(Theme.faint)
             ForEach(runner.sessions.filter { $0.id != s.id }) { o in
                 Button { runner.stop(o.game) } label: {
                     HStack(spacing: 6) {
@@ -515,7 +532,7 @@ struct NowPlayingPanel: View {
                 .buttonStyle(.plain)
             }
             Spacer()
-            Text("квесты идут по всем запущенным играм")
+            Text(t("quests count for every running game", "квесты идут по всем запущенным играм"))
                 .font(.system(size: 12)).foregroundStyle(Theme.faint)
         }
     }
@@ -530,17 +547,17 @@ struct QueuePanel: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .firstTextBaseline, spacing: 10) {
-                Text("Очередь").font(.system(size: 22, weight: .bold))
+                Text(t("Queue", "Очередь")).font(.system(size: 22, weight: .bold))
                 Text(summary).font(.system(size: 13)).foregroundStyle(Theme.muted)
                 Spacer()
                 if !runner.queueRunning {
-                    Button("Очистить") { runner.clearQueue() }
+                    Button(t("Clear", "Очистить")) { runner.clearQueue() }
                         .buttonStyle(.plain)
                         .font(.system(size: 13))
                         .foregroundStyle(Theme.muted)
                         .padding(.trailing, 6)
                     Button { runner.startQueue() } label: {
-                        Label("Запустить очередь", systemImage: "play.fill")
+                        Label(t("Start queue", "Запустить очередь"), systemImage: "play.fill")
                             .font(.system(size: 13, weight: .bold))
                             .padding(.horizontal, 16).frame(height: 36)
                             .background(Theme.orange, in: Capsule())
@@ -565,7 +582,7 @@ struct QueuePanel: View {
     private var summary: String {
         let total = runner.queue.reduce(0) { $0 + $1.minutes }
         let games = runner.queue.count
-        return "\(games) \(plural(games, "игра", "игры", "игр")) · около \(total) мин · между играми 5 секунд"
+        return t("\(games) \(games == 1 ? "game" : "games") · about \(total) min · 5 s between games", "\(games) \(plural(games, "игра", "игры", "игр")) · около \(total) мин · между играми 5 секунд")
     }
 
     private func row(_ item: QueueItem, isFirst: Bool, isLast: Bool) -> some View {
@@ -575,26 +592,26 @@ struct QueuePanel: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(item.game.n).font(.system(size: 14, weight: .semibold)).lineLimit(1)
                     .foregroundStyle(current ? Theme.orange : Theme.text)
-                Text(current ? "Сейчас запущена" : "Ждёт своей очереди")
+                Text(current ? t("Running now", "Сейчас запущена") : t("Waiting for its turn", "Ждёт своей очереди"))
                     .font(.system(size: 12)).foregroundStyle(Theme.faint)
             }
             Spacer()
             Menu {
                 ForEach(durations, id: \.self) { m in
-                    Button("\(m) мин") { runner.setMinutes(m, for: item) }
+                    Button(t("\(m) min", "\(m) мин")) { runner.setMinutes(m, for: item) }
                 }
             } label: {
-                Text("\(item.minutes) мин").font(.system(size: 13, weight: .medium)).monospacedDigit()
+                Text(t("\(item.minutes) min", "\(item.minutes) мин")).font(.system(size: 13, weight: .medium)).monospacedDigit()
             }
             .menuStyle(.borderlessButton)
             .fixedSize()
             .disabled(current)
-            .help("Сколько минут требует квест")
+            .help(t("Minutes the quest needs", "Сколько минут требует квест"))
 
             HStack(spacing: 2) {
-                iconButton("chevron.up", "Выше") { runner.move(item, by: -1) }.disabled(isFirst || current)
-                iconButton("chevron.down", "Ниже") { runner.move(item, by: 1) }.disabled(isLast || current)
-                iconButton("xmark", current ? "Пропустить" : "Убрать") { runner.dequeue(item) }
+                iconButton("chevron.up", t("Up", "Выше")) { runner.move(item, by: -1) }.disabled(isFirst || current)
+                iconButton("chevron.down", t("Down", "Ниже")) { runner.move(item, by: 1) }.disabled(isLast || current)
+                iconButton("xmark", current ? t("Skip", "Пропустить") : t("Remove", "Убрать")) { runner.dequeue(item) }
             }
         }
         .padding(.horizontal, 16).padding(.vertical, 12)

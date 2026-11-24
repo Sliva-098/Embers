@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; img-src https://cdn.discordapp.com data:; style-src 'self'; script-src 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Embers</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header id="top">
+    <div class="brand">
+      <svg class="flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.4 2.2c.3 2.6-1 4.1-2.5 5.7C8.3 9.600 6.500 11.400 6.500 14.300a5.600 5.600 0 0 0 11.200.2c0-2.100-1-3.600-2-4.800.1 1.300-.4 2.300-1.300 2.900.5-3.500-.2-7.500-2-10.400Z"/></svg>
+      <span>Embers</span>
+    </div>
+    <div class="top-actions">
+      <button id="lang" class="pill" title=""><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.600 2.600 3.900 5.600 3.900 9S14.600 18.400 12 21c-2.600-2.600-3.900-5.600-3.900-9S9.400 5.600 12 3Z"/></svg><b id="langLabel">EN</b></button>
+      <button id="refresh" class="round" title=""><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.400-5.700M20 4v5h-5"/></svg></button>
+    </div>
+  </header>
+
+  <main id="scroll">
+    <div id="content">
+      <section id="now" class="panel"></section>
+      <section id="queueBox"></section>
+      <label id="searchBox"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.500-3.500"/></svg>
+        <input id="search" type="text" autocomplete="off" spellcheck="false">
+        <button id="clearSearch" hidden aria-label="Clear"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+        <kbd id="kbd">Ctrl F</kbd>
+      </label>
+      <section id="featured"></section>
+      <section id="library"></section>
+    </div>
+  </main>
+
+  <div id="toast" hidden></div>
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -79,7 +79,7 @@ final class Runner: ObservableObject {
             }
             sessions.append(Session(id: game.id, game: game, exePath: target.path, startedAt: Date(), process: p, goal: goal))
         } catch {
-            self.error = "Не удалось запустить «\(game.name)»: \(error.localizedDescription)"
+            self.error = t("Couldn't start “\(game.name)”: \(error.localizedDescription)", "Не удалось запустить «\(game.name)»: \(error.localizedDescription)")
         }
     }
 
